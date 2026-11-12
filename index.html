@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#111111">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="TOLUA Notes">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>TOLUA Quick Notes</title>
+<style>
+:root{--bg:#101010;--panel:#1b1b1b;--panel2:#242424;--gold:#e6b422;--orange:#d9782b;--txt:#f4f1ea;--muted:#aaa49a;--line:#343434;--green:#7dbb83}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text",Tahoma,Arial,sans-serif}
+header{padding:calc(env(safe-area-inset-top) + 18px) 18px 16px;background:linear-gradient(135deg,#17120d,#24201a);border-bottom:1px solid #3a2c17}
+.brand{display:flex;align-items:center;justify-content:space-between}.brand h1{font-size:21px;margin:0;font-weight:800;letter-spacing:.3px}.brand small{display:block;color:#c8a75b;font-size:11px;margin-top:4px}.mark{width:42px;height:42px;border:1px solid var(--gold);border-radius:14px;display:grid;place-items:center;color:var(--gold);font-weight:900;font-size:20px}
+main{max-width:720px;margin:auto;padding:16px 14px 100px}.datebar{display:flex;justify-content:space-between;align-items:center;margin:8px 2px 14px;color:var(--muted);font-size:13px}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:14px;margin-bottom:14px}
+.voice{display:flex;align-items:center;gap:12px}.mic{width:58px;height:58px;flex:0 0 58px;border:0;border-radius:18px;background:linear-gradient(145deg,#f0bd37,#c9791e);color:#17120a;font-size:25px;font-weight:900}
+.voice strong{display:block;font-size:15px}.voice p{margin:5px 0 0;color:var(--muted);font-size:12px;line-height:1.7}
+textarea{width:100%;min-height:84px;resize:vertical;background:#111;border:1px solid #414141;border-radius:13px;padding:12px;color:var(--txt);font:inherit;line-height:1.8;outline:none}
+textarea:focus{border-color:var(--gold)}.fieldlabel{font-size:12px;color:var(--muted);display:block;margin:12px 2px 7px}
+.actions{display:flex;gap:8px;margin-top:10px}.btn{border:1px solid #4b4028;border-radius:12px;background:#29241a;color:#f6d98a;padding:11px 14px;font:inherit;font-size:13px}.btn.primary{background:var(--gold);color:#17120a;border-color:var(--gold);font-weight:800;flex:1}.btn:disabled{opacity:.5}
+.dayhead{display:flex;justify-content:space-between;align-items:center;margin:20px 3px 10px}.dayhead h2{font-size:15px;margin:0}.count{font-size:11px;color:var(--muted)}
+.item{display:flex;gap:11px;align-items:flex-start;background:var(--panel);border:1px solid var(--line);border-radius:15px;padding:13px;margin-bottom:9px}
+.item.done{opacity:.56}.item.done .content{text-decoration:line-through}
+.check{appearance:none;width:23px;height:23px;border:2px solid #82745b;border-radius:50%;margin:2px 0 0;flex:0 0 23px;position:relative}
+.check:checked{background:var(--gold);border-color:var(--gold)}.check:checked:after{content:"✓";position:absolute;inset:0;color:#17120a;font-size:16px;font-weight:900;text-align:center;line-height:19px}
+.body{min-width:0;flex:1}.content{font-size:14px;line-height:1.85;white-space:pre-wrap;overflow-wrap:anywhere}.meta{display:flex;gap:9px;align-items:center;margin-top:6px;color:var(--muted);font-size:10px}.tag{color:#d9b75e}.itemtools{display:flex;gap:6px}.iconbtn{background:transparent;border:0;color:#aaa;padding:3px;font-size:16px}
+.empty{text-align:center;color:var(--muted);padding:28px 12px;font-size:13px;line-height:2}
+footer{position:fixed;bottom:0;left:0;right:0;background:#141414ed;border-top:1px solid var(--line);padding:10px 14px calc(env(safe-area-inset-bottom) + 10px);display:flex;gap:8px;justify-content:center;backdrop-filter:blur(12px)}
+footer .btn{flex:1;max-width:220px}
+.note{font-size:11px;color:var(--muted);line-height:1.8;margin:8px 3px}
+.toast{position:fixed;bottom:85px;left:50%;transform:translateX(-50%);background:#29251c;border:1px solid #715a26;color:#ffe3a0;padding:10px 15px;border-radius:12px;font-size:12px;display:none;z-index:5}
+@media(min-width:600px){main{padding-top:24px}.mic{width:64px;height:64px}}
+</style>
+</head>
+<body>
+<header><div class="brand"><div><h1>TOLUA <span style="color:#e6b422">QUICK NOTES</span></h1><small>دفتر سریع ثبت معاملات</small></div><div class="mark">T</div></div></header>
+<main>
+  <div class="datebar"><span id="today"></span><span id="total">۰ یادداشت</span></div>
+  <section class="panel">
+    <div class="voice">
+      <button class="mic" id="mic" aria-label="ضبط صوت">🎙</button>
+      <div><strong id="voiceTitle">ثبت سریع با صدا</strong><p id="voiceHelp">دکمه را بزن و معامله را تعریف کن. اگر تشخیص گفتار در Safari فعال نباشد، از میکروفون کیبورد آیفون استفاده کن.</p></div>
+    </div>
+    <label class="fieldlabel" for="noteText">متن معامله / یادداشت</label>
+    <textarea id="noteText" placeholder="مثلاً: خرید ۲ گرم و ۵۵۰ سوت از محسن، پرداخت نشده..."></textarea>
+    <div class="actions"><button class="btn primary" id="save">＋ افزودن به دفتر</button><button class="btn" id="clear">پاک‌کردن</button></div>
+  </section>
+  <div class="dayhead"><h2>یادداشت‌های ثبت‌شده</h2><span class="count">برای تکمیل سند، دایره را تیک بزن</span></div>
+  <div id="list"></div>
+  <p class="note">این برنامه فقط دفتر یادداشت و پیگیری ثبت سند است؛ مبلغ‌ها را محاسبه نمی‌کند و هیچ سند حسابداری تولید نمی‌کند. اطلاعات این نسخه روی همین دستگاه ذخیره می‌شود.</p>
+</main>
+<footer><button class="btn" id="export">خروجی پشتیبان</button><button class="btn" id="import">بازیابی پشتیبان</button><button class="btn" id="csv">خروجی CSV</button><input id="file" type="file" accept="application/json" hidden></footer>
+<div class="toast" id="toast"></div>
+<script>
+const KEY='tolua_quick_notes_v1';
+let entries=JSON.parse(localStorage.getItem(KEY)||'[]');
+const $=id=>document.getElementById(id);
+const fa=n=>new Intl.NumberFormat('fa-IR').format(n);
+function dateLabel(iso){const d=new Date(iso);return new Intl.DateTimeFormat('fa-IR',{weekday:'long',day:'numeric',month:'long',year:'numeric'}).format(d)}
+function timeLabel(iso){return new Intl.DateTimeFormat('fa-IR',{hour:'2-digit',minute:'2-digit'}).format(new Date(iso))}
+function persist(){localStorage.setItem(KEY,JSON.stringify(entries));render()}
+function toast(s){$('toast').textContent=s;$('toast').style.display='block';setTimeout(()=>$('toast').style.display='none',2300)}
+function render(){
+ $('today').textContent=dateLabel(new Date().toISOString());
+ $('total').textContent=fa(entries.length)+' یادداشت';
+ const list=$('list');list.innerHTML='';
+ if(!entries.length){list.innerHTML='<div class="panel empty">هنوز یادداشتی ثبت نشده است.<br>اولین معامله را با دکمه میکروفون یا تایپ صوتی کیبورد ثبت کن.</div>';return}
+ const groups={};
+ [...entries].sort((a,b)=>b.createdAt.localeCompare(a.createdAt)).forEach(e=>(groups[e.day]??=[]).push(e));
+ Object.keys(groups).forEach(day=>{
+  const h=document.createElement('div');h.className='dayhead';h.innerHTML='<h2>'+day+'</h2><span class="count">'+fa(groups[day].length)+' مورد</span>';list.appendChild(h);
+  groups[day].forEach(e=>{
+   const row=document.createElement('div');row.className='item'+(e.done?' done':'');
+   const cb=document.createElement('input');cb.type='checkbox';cb.className='check';cb.checked=!!e.done;cb.setAttribute('aria-label','ثبت سند انجام شد');cb.onchange=()=>{e.done=cb.checked;persist()};
+   const body=document.createElement('div');body.className='body';
+   const content=document.createElement('div');content.className='content';content.textContent=e.text;
+   const meta=document.createElement('div');meta.className='meta';meta.innerHTML='<span>'+timeLabel(e.createdAt)+'</span><span class="tag">'+(e.done?'سند ثبت شد':'در انتظار ثبت سند')+'</span>';
+   body.append(content,meta);
+   const tools=document.createElement('div');tools.className='itemtools';
+   const edit=document.createElement('button');edit.className='iconbtn';edit.textContent='✎';edit.title='ویرایش';edit.onclick=()=>{const v=prompt('ویرایش یادداشت',e.text);if(v!==null&&v.trim()){e.text=v.trim();persist()}};
+   const del=document.createElement('button');del.className='iconbtn';del.textContent='×';del.title='حذف';del.onclick=()=>{if(confirm('این یادداشت حذف شود؟')){entries=entries.filter(x=>x.id!==e.id);persist()}};
+   tools.append(edit,del);row.append(cb,body,tools);list.appendChild(row);
+  });
+ });
+}
+$('save').onclick=()=>{const text=$('noteText').value.trim();if(!text){toast('اول متن معامله را بگو یا وارد کن');return}const now=new Date();entries.push({id:crypto.randomUUID?crypto.randomUUID():String(Date.now()),text,createdAt:now.toISOString(),day:dateLabel(now.toISOString()),done:false});$('noteText').value='';persist();toast('یادداشت به دفتر اضافه شد')};
+$('clear').onclick=()=>$('noteText').value='';
+const Speech=window.SpeechRecognition||window.webkitSpeechRecognition;
+if(Speech){
+ const rec=new Speech();rec.lang='fa-IR';rec.interimResults=true;rec.continuous=false;
+ $('mic').onclick=()=>{try{rec.start();$('voiceTitle').textContent='در حال شنیدن…';$('mic').textContent='⏺'}catch(e){toast('اجازه میکروفون را بررسی کن')}};
+ rec.onresult=e=>{let s='';for(let i=e.resultIndex;i<e.results.length;i++)s+=e.results[i][0].transcript;$('noteText').value=s};
+ rec.onend=()=>{$('voiceTitle').textContent='ثبت سریع با صدا';$('mic').textContent='🎙'};
+ rec.onerror=e=>{toast('تشخیص گفتار در این مرورگر در دسترس نیست؛ از دیکته کیبورد استفاده کن');$('voiceTitle').textContent='ثبت سریع با صدا';$('mic').textContent='🎙'};
+}else{$('mic').onclick=()=>{ $('noteText').focus();toast('از دکمه میکروفون روی کیبورد آیفون برای دیکته فارسی استفاده کن')};}
+$('export').onclick=()=>{const blob=new Blob([JSON.stringify(entries,null,2)],{type:'application/json'});download(blob,'TOLUA-backup-'+Date.now()+'.json')};
+$('csv').onclick=()=>{const rows=[['date','time','note','document_entered'],...entries.map(e=>[e.day,timeLabel(e.createdAt),e.text,e.done?'yes':'no'])];const csv=rows.map(r=>r.map(x=>'"'+String(x).replaceAll('"','""')+'"').join(',')).join('\r\n');download(new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8'}),'TOLUA-notes.csv')};
+$('import').onclick=()=>$('file').click();
+$('file').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{const data=JSON.parse(await f.text());if(!Array.isArray(data))throw 0;if(confirm('یادداشت‌های پشتیبان به دفتر فعلی اضافه شوند؟')){entries.push(...data);persist();toast('پشتیبان بازیابی شد')}}catch(_){toast('فایل پشتیبان معتبر نیست')}e.target.value=''};
+function download(blob,name){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
+if('serviceWorker'in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
+render();
+</script>
+</body></html>
